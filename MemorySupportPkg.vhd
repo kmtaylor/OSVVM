@@ -50,7 +50,9 @@ library IEEE ;
   
 package MemorySupportPkg is
 
-  subtype MemoryBaseType is integer_vector ; 
+  constant C_FIXED_BASE_SIZE : natural := 32;
+
+  subtype MemoryBaseType is integer_vector(C_FIXED_BASE_SIZE-1 downto 0) ; 
 
   -- -----------------------------------------------
   -- Memory Policy X
@@ -102,7 +104,8 @@ package body MemorySupportPkg is
   function SizeMemoryBaseType_X(Size : integer) return integer is  
   ------------------------------------------------------------
   begin
-    return integer(Ceil(real(Size)/16.0)) ; 
+--    return integer(Ceil(real(Size)/16.0)) ; 
+    return C_FIXED_BASE_SIZE;
   end function SizeMemoryBaseType_X ; 
   
   ------------------------------------------------------------
@@ -112,7 +115,7 @@ package body MemorySupportPkg is
     variable Bits16        : std_logic_vector(15 downto 0) ;
     variable BitIsX        : std_logic_vector(15 downto 0) ; 
     variable BitVal        : std_logic_vector(15 downto 0) ;
-    variable result        : integer_vector (Size-1 downto 0) ; 
+    variable result        : integer_vector (C_FIXED_BASE_SIZE-1 downto 0) ; 
   begin
     NormalizedSlv := Resize(Slv, Size*16) ; 
     for MemIndex in result'reverse_range loop 
@@ -158,7 +161,7 @@ package body MemorySupportPkg is
   ------------------------------------------------------------
   function InitMemoryBaseType_X(Size : integer) return integer_vector is  
   ------------------------------------------------------------
-    constant BaseU : integer_vector(0 to Size-1)  := (others => -1) ;
+    constant BaseU : integer_vector(C_FIXED_BASE_SIZE-1 downto 0)  := (others => -1) ;
   begin
     return BaseU ; 
   end function InitMemoryBaseType_X ; 
@@ -173,7 +176,8 @@ package body MemorySupportPkg is
   function SizeMemoryBaseType_NoX(Size : integer) return integer is  
   ------------------------------------------------------------
   begin
-    return integer(Ceil(real(Size)/32.0)) ; 
+--    return integer(Ceil(real(Size)/32.0)) ; 
+    return C_FIXED_BASE_SIZE;
   end function SizeMemoryBaseType_NoX ; 
   
   ------------------------------------------------------------
@@ -218,7 +222,7 @@ package body MemorySupportPkg is
   ------------------------------------------------------------
   function InitMemoryBaseType_NoX(Size : integer) return integer_vector is  
   ------------------------------------------------------------
-    constant BaseU : integer_vector(0 to Size-1)  := (others => 0) ;
+    constant BaseU : integer_vector(C_FIXED_BASE_SIZE-1 downto 0)  := (others => 0) ;
   begin
     return BaseU ; 
   end function InitMemoryBaseType_NoX ; 
@@ -242,14 +246,14 @@ package body MemorySupportPkg is
   ------------------------------------------------------------
   function ToMemoryBaseType_orig(Slv : std_logic_vector ; Size : integer) return integer_vector is 
   ------------------------------------------------------------
-    variable result : integer ; 
+    variable result : integer_vector(C_FIXED_BASE_SIZE-1 downto 0);
   begin
     if (Is_X(Slv)) then 
-      result := -1 ;
+      result(0) := -1 ;
     else
-      result := to_integer( Slv ) ;
+      result(0) := to_integer( Slv ) ;
     end if ;
-    return (1 => result) ; 
+    return result;
   end function ToMemoryBaseType_orig ; 
   
   ------------------------------------------------------------
@@ -257,10 +261,10 @@ package body MemorySupportPkg is
   ------------------------------------------------------------
     variable Data : std_logic_vector(Size-1 downto 0) ; 
   begin
-    if Mem(Mem'left) >= 0 then 
+    if Mem(0) >= 0 then 
       -- Get the Word from the Array
-      Data := to_slv(Mem(Mem'left), Size) ;
-    elsif Mem(Mem'left) = -1 then 
+      Data := to_slv(Mem(0), Size) ;
+    elsif Mem(0) = -1 then 
      -- X in Word, return all X
       Data := (Data'range => 'X') ;
     else 
@@ -273,8 +277,9 @@ package body MemorySupportPkg is
   ------------------------------------------------------------
   function InitMemoryBaseType_orig(Size : integer) return integer_vector is  
   ------------------------------------------------------------
+    constant BaseU : integer_vector(C_FIXED_BASE_SIZE-1 downto 0)  := (others => -1) ;
   begin
-    return (1 => integer'left) ; 
+    return BaseU ; 
   end function InitMemoryBaseType_orig ; 
  
 end MemorySupportPkg ;
