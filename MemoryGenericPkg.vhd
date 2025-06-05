@@ -529,7 +529,7 @@ package body MemoryGenericPkg is
     function InitMemoryBlockType(BlockWidth, BaseWidth : integer) return MemBlockType is  
     ------------------------------------------------------------
 -- This keeps MemoryBaseType from being a generic type
-      constant BaseU : MemoryBaseType(BaseWidth-1 downto 0) := InitMemoryBaseType(BaseWidth) ;
+      constant BaseU : MemoryBaseType := InitMemoryBaseType(BaseWidth) ;
       variable retval : MemBlockType(0 to 2**BlockWidth-1) := (others => BaseU);
 --!! GHDL Bug     constant BaseU : MemoryBaseType := InitMemoryBaseType(BaseWidth) ;
     begin
